@@ -239,7 +239,6 @@ name = "vwallpaper"
 version = "0.1.0"
 dependencies = [
  "dirs",
- "serde",
  "toml",
 ]
 
