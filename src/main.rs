@@ -1,5 +1,6 @@
 use std::process::{self};
 
+mod apps;
 mod config;
 mod models;
 mod runner;
