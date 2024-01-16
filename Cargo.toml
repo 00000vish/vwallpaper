@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 toml = "0.8.8"
+tokio = { version="1.35.1", features= ["full"] }
 dirs = "3.0.2"

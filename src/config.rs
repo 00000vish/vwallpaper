@@ -14,15 +14,14 @@ pub fn read_config() -> Result<Config, String> {
         ));
     }
 
-    let toml_str = fs::read_to_string(get_config_file_path());
-    match toml_str {
+    let toml_str = match fs::read_to_string(get_config_file_path()) {
         Err(error) => {
             return Result::Err(format!("Could not read config file.\n{}\nExiting.", error))
         }
-        _ => (),
-    }
+        Ok(value) => value,
+    };
 
-    let toml_map = toml_str.unwrap().parse::<Table>().unwrap();
+    let toml_map = toml_str.parse::<Table>().unwrap();
 
     let mut config = Config {
         app: "".to_string(),
