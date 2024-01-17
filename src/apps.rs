@@ -5,7 +5,7 @@ mod hyprpaper;
 
 pub trait App {
     fn get_name(&self) -> String;
-    fn set_wallpaper(&self);
+    fn set_wallpaper(&self, wallpaper_path: String);
 }
 
 pub fn get_app(config: &Config) -> Option<Box<dyn App>> {

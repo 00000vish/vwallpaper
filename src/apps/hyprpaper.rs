@@ -12,5 +12,6 @@ impl App for Hyprpaper {
     fn get_name(&self) -> String {
         return "hyprpaper".to_string();
     }
-    fn set_wallpaper(&self) {}
+
+    fn set_wallpaper(&self, wallpaper_path: String) {}
 }
