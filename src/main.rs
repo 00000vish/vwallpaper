@@ -1,9 +1,11 @@
-use std::process::{self};
-
 mod apps;
 mod config;
+mod helpers;
 mod models;
 mod runner;
+
+use runner::Runner;
+use std::process::{self};
 
 #[tokio::main]
 async fn main() -> () {
@@ -15,5 +17,6 @@ async fn main() -> () {
         }
     };
 
-    runner::run(config).await;
+    let mut runner = Runner::new(config);
+    runner.run().await;
 }

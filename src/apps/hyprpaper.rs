@@ -1,22 +1,16 @@
-use crate::{apps::App, models::Config};
+use crate::apps::App;
 
-pub struct Hyprpaper {
-    name: Option<String>,
-}
+pub struct Hyprpaper {}
+
 impl Hyprpaper {
     pub fn new() -> Self {
-        Self {
-            name: Some("".to_string()),
-        }
+        Self {}
     }
 }
 
 impl App for Hyprpaper {
-    fn initialize(&mut self, config: Config) {
-        self.name = Some(config.app);
-    }
     fn get_name(&self) -> String {
-        let val = &self.name.as_ref().unwrap();
-        return val.to_string();
+        return "hyprpaper".to_string();
     }
+    fn set_wallpaper(&self) {}
 }

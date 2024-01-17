@@ -30,7 +30,6 @@ pub fn read_config() -> Result<Config, String> {
     };
 
     for (key, value) in toml_map {
-        println!("{} => {} ", key, value);
         if key == "app" {
             config.app = value.to_string();
         } else if key == "seconds" {
