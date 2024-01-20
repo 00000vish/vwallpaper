@@ -1,6 +1,5 @@
 use crate::{
     apps::{self, App},
-    helpers,
     models::Config,
 };
 use std::time::Duration;
@@ -33,12 +32,8 @@ impl Runner {
 
     async fn run_loop(&self) {
         loop {
-            let wallpaper = match helpers::get_wallpaper(&self.config) {
-                None => return,
-                Some(value) => value,
-            };
             if let Some(app) = &self.app {
-                app.set_wallpaper(wallpaper);
+                app.run(&self.config);
             }
             sleep(Duration::from_secs(self.config.seconds)).await;
         }

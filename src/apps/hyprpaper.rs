@@ -1,4 +1,4 @@
-use crate::apps::App;
+use crate::{apps::App, models::Config};
 
 pub struct Hyprpaper {}
 
@@ -13,5 +13,5 @@ impl App for Hyprpaper {
         return "hyprpaper".to_string();
     }
 
-    fn set_wallpaper(&self, wallpaper_path: String) {}
+    fn run(&self, config: &Config) {}
 }
