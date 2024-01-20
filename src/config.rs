@@ -24,14 +24,14 @@ pub fn read_config() -> Result<Config, String> {
     let toml_map = toml_str.parse::<Table>().unwrap();
 
     let mut config = Config {
-        app: "".to_string(),
+        config_file: "".to_string(),
         displays: vec![],
         seconds: 0,
     };
 
     for (key, value) in toml_map {
-        if key == "app" {
-            config.app = value.to_string();
+        if key == "config_file" {
+            config.config_file = value.to_string();
         } else if key == "seconds" {
             config.seconds = value.to_string().parse::<u64>().unwrap();
         } else {
@@ -47,12 +47,12 @@ pub fn read_config() -> Result<Config, String> {
 }
 
 fn parse_display_struct(data: Value) -> Result<Display, String> {
-    let output_name_value = data.get("output_name");
+    let output_name_value = data.get("keyword");
     let file_value = data.get("file");
     let directoy_value = data.get("directoy");
 
     let mut display = Display {
-        name: output_name_value.unwrap().to_string(),
+        keyword: output_name_value.unwrap().to_string(),
         file: None,
         directoy: None,
     };
@@ -60,7 +60,7 @@ fn parse_display_struct(data: Value) -> Result<Display, String> {
     if !output_name_value.is_some() {
         return Err("Please specify output name.".to_string());
     } else {
-        display.name = output_name_value.unwrap().to_string();
+        display.keyword = output_name_value.unwrap().to_string();
     }
 
     if file_value.is_some() {

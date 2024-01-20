@@ -1,4 +1,4 @@
-mod apps;
+mod app;
 mod config;
 mod helpers;
 mod models;

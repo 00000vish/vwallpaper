@@ -1,39 +1,30 @@
-use crate::{
-    apps::{self, App},
-    models::Config,
-};
+use crate::{app::App, models::Config};
 use std::time::Duration;
 use tokio::time::sleep;
 
-pub struct Runner {
+pub struct Runner<'r> {
     config: Config,
-    app: Option<Box<dyn App>>,
+    app: Option<App<'r>>,
 }
 
-impl Runner {
+impl<'r> Runner<'r> {
     pub fn new(config: Config) -> Self {
         Self { config, app: None }
     }
 
     pub async fn run(&mut self) {
-        if !self.initialize() {
-            return;
-        }
+        self.initialize();
         self.run_loop().await;
     }
 
-    fn initialize(&mut self) -> bool {
-        self.app = match apps::get_app(&self.config) {
-            Some(value) => Some(value),
-            None => return false,
-        };
-        return true;
+    fn initialize(&mut self) {
+        self.app = Some(App::new(&self.config));
     }
 
     async fn run_loop(&self) {
         loop {
             if let Some(app) = &self.app {
-                app.run(&self.config);
+                app.start(&self.config);
             }
             sleep(Duration::from_secs(self.config.seconds)).await;
         }
