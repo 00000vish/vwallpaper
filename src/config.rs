@@ -1,11 +1,12 @@
 use crate::models::{Config, Display};
 use dirs;
+use std::rc::Rc;
 use std::u64;
 use std::{fs, path::Path};
 use toml::Table;
 use toml::Value;
 
-pub fn read_config() -> Result<Config, String> {
+pub fn read_config() -> Result<Rc<Config>, String> {
     let found = Path::new(&get_config_file_path()).exists();
     if !found {
         return Result::Err(format!(
@@ -24,13 +25,16 @@ pub fn read_config() -> Result<Config, String> {
     let toml_map = toml_str.parse::<Table>().unwrap();
 
     let mut config = Config {
+        app: "".to_string(),
         config_file: "".to_string(),
         displays: vec![],
         seconds: 0,
     };
 
     for (key, value) in toml_map {
-        if key == "config_file" {
+        if key == "app" {
+            config.app = value.to_string();
+        } else if key == "config_file" {
             config.config_file = value.to_string();
         } else if key == "seconds" {
             config.seconds = value.to_string().parse::<u64>().unwrap();
@@ -43,7 +47,7 @@ pub fn read_config() -> Result<Config, String> {
         }
     }
 
-    Ok(config)
+    Ok(Rc::new(config))
 }
 
 fn parse_display_struct(data: Value) -> Result<Display, String> {

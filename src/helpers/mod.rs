@@ -1,8 +1,9 @@
-use std::fs::{self};
-
-use rand::seq::SliceRandom;
-
 use crate::models::Display;
+use rand::seq::SliceRandom;
+use std::{
+    fs::{self, File},
+    io::Write,
+};
 
 pub fn get_wallpaper(display: Display) -> Result<String, String> {
     match display.file {
@@ -41,4 +42,24 @@ pub fn get_wallpaper(display: Display) -> Result<String, String> {
     };
 
     Ok(wallpaper_file.to_string())
+}
+
+pub fn update_file(path: String, content: String) -> bool {
+    let mut file = match File::create(path) {
+        Err(_) => return false,
+        Ok(value) => value,
+    };
+
+    _ = file.write_all(content.as_bytes());
+
+    return true;
+}
+
+pub fn read_file(path: String) -> Option<String> {
+    let file = match fs::read_to_string(path) {
+        Err(_) => return None,
+        Ok(value) => value,
+    };
+
+    return Some(file);
 }

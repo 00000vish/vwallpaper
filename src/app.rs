@@ -1,15 +1,25 @@
-use crate::models::Config;
+use crate::{helpers, models::Config};
+use std::{process::Command, rc::Rc};
 
-pub struct App<'a> {
-    config: &'a Config,
+pub struct App {
+    config: Rc<Config>,
+    app_config: String,
 }
 
-impl<'a> App<'a> {
-    pub fn new(config: &'a Config) -> Self {
-        Self { config }
+impl App {
+    pub fn new(config: Rc<Config>) -> Option<Self> {
+        let app_config = helpers::read_file(config.config_file.clone())?;
+        Some(Self { config, app_config })
     }
-    pub fn start(&self, config: &Config) {}
+
+    pub fn start(&self) {
+        self.stop();
+    }
+
     pub fn stop(&self) -> bool {
-        return true;
+        match Command::new("kilall").arg(self.config.app.clone()).output() {
+            Err(_) => return false,
+            Ok(_) => return true,
+        }
     }
 }
