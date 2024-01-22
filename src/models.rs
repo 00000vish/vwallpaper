@@ -1,8 +1,9 @@
 pub struct Config {
     pub app: String,
     pub config_file: String,
-    pub displays: Vec<Display>,
     pub seconds: u64,
+    pub displays: Vec<Display>,
+    pub app_config: String,
 }
 
 pub struct Display {

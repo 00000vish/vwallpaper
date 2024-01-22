@@ -1,7 +1,6 @@
 use crate::models::{Config, Display};
 use dirs;
 use std::rc::Rc;
-use std::u64;
 use std::{fs, path::Path};
 use toml::Table;
 use toml::Value;
@@ -29,15 +28,17 @@ pub fn read_config() -> Result<Rc<Config>, String> {
         config_file: "".to_string(),
         displays: vec![],
         seconds: 0,
+        app_config: "".to_string(),
     };
 
     for (key, value) in toml_map {
         if key == "app" {
-            config.app = value.to_string();
+            config.app = check_value_valid(key, value)?;
         } else if key == "config_file" {
-            config.config_file = value.to_string();
+            config.config_file = check_value_valid(key, value)?;
         } else if key == "seconds" {
-            config.seconds = value.to_string().parse::<u64>().unwrap();
+            config.seconds = check_value_valid(key, value)?.parse().unwrap_or(1800);
+        } else if key == "Config" {
         } else {
             let display = parse_display_struct(value);
             match display {
@@ -50,8 +51,22 @@ pub fn read_config() -> Result<Rc<Config>, String> {
     Ok(Rc::new(config))
 }
 
+fn check_value_valid(key: String, value: Value) -> Result<String, String> {
+    match value.to_string().trim() {
+        "" => Err(format!("Invalid input for key {}", key)),
+        string_val => Ok(string_val.to_string()),
+    }
+}
+
+fn get_data_from_value(key: String, value: Value) -> Result<String, String> {
+    match value.get(key.to_string()) {
+        Some(data) => Ok(check_value_valid(key, value)?),
+        None => Err(format!("Invalid input for key {}", key)),
+    }
+}
+
 fn parse_display_struct(data: Value) -> Result<Display, String> {
-    let output_name_value = data.get("keyword");
+    let output_name_value = data.get("keyword").unwrap().clone().to_string();
     let file_value = data.get("file");
     let directoy_value = data.get("directoy");
 
