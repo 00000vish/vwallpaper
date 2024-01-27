@@ -10,7 +10,7 @@ pub fn get_wallpaper(display: Display) -> Result<String, String> {
         Some(value) => return Ok(value),
         None => (),
     }
-    let directory = match display.directoy {
+    let directory = match display.directory {
         None => return Err("Please specify a wallpaper for directory.".to_string()),
         Some(value) => value,
     };

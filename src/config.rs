@@ -1,3 +1,4 @@
+use crate::helpers;
 use crate::models::{Config, Display};
 use dirs;
 use std::rc::Rc;
@@ -21,7 +22,10 @@ pub fn read_config() -> Result<Rc<Config>, String> {
         Ok(value) => value,
     };
 
-    let toml_map = toml_str.parse::<Table>().unwrap();
+    let toml_map = match toml_str.parse::<Table>() {
+        Ok(value) => value,
+        Err(error) => return Err(error.to_string()),
+    };
 
     let mut config = Config {
         app: "".to_string(),
@@ -33,12 +37,13 @@ pub fn read_config() -> Result<Rc<Config>, String> {
 
     for (key, value) in toml_map {
         if key == "app" {
-            config.app = check_value_valid(key, value)?;
+            config.app = check_value_valid(key, &value)?;
         } else if key == "config_file" {
-            config.config_file = check_value_valid(key, value)?;
+            config.config_file = check_value_valid(key, &value)?;
         } else if key == "seconds" {
-            config.seconds = check_value_valid(key, value)?.parse().unwrap_or(1800);
+            config.seconds = check_value_valid(key, &value)?.parse().unwrap_or(1800);
         } else if key == "Config" {
+            config.app_config = get_app_config(value)?;
         } else {
             let display = parse_display_struct(value);
             match display {
@@ -51,48 +56,52 @@ pub fn read_config() -> Result<Rc<Config>, String> {
     Ok(Rc::new(config))
 }
 
-fn check_value_valid(key: String, value: Value) -> Result<String, String> {
+fn get_app_config(data: Value) -> Result<String, String> {
+    let template = get_data_from_value("template".to_string(), &data);
+    let file = get_data_from_value("file".to_string(), &data);
+
+    if !file.is_ok() && !template.is_ok() {
+        return Err("Please specify file or directory".to_string());
+    }
+
+    if file.is_ok() {
+        match helpers::read_file(file.unwrap()) {
+            None => return Err("Could not read config file".to_string()),
+            Some(value) => return Ok(value),
+        }
+    } else {
+        return Ok(template.unwrap());
+    }
+}
+
+fn check_value_valid(key: String, value: &Value) -> Result<String, String> {
     match value.to_string().trim() {
         "" => Err(format!("Invalid input for key {}", key)),
         string_val => Ok(string_val.to_string()),
     }
 }
 
-fn get_data_from_value(key: String, value: Value) -> Result<String, String> {
+fn get_data_from_value(key: String, value: &Value) -> Result<String, String> {
     match value.get(key.to_string()) {
-        Some(data) => Ok(check_value_valid(key, value)?),
+        Some(data) => Ok(check_value_valid(key, data)?),
         None => Err(format!("Invalid input for key {}", key)),
     }
 }
 
 fn parse_display_struct(data: Value) -> Result<Display, String> {
-    let output_name_value = data.get("keyword").unwrap().clone().to_string();
-    let file_value = data.get("file");
-    let directoy_value = data.get("directoy");
+    let keyword = get_data_from_value("keyword".to_string(), &data)?;
+    let file = get_data_from_value("file".to_string(), &data);
+    let directory = get_data_from_value("directory".to_string(), &data);
 
-    let mut display = Display {
-        keyword: output_name_value.unwrap().to_string(),
-        file: None,
-        directoy: None,
+    if !file.is_ok() && !directory.is_ok() {
+        return Err("Please specify file or directory".to_string());
+    }
+
+    let display = Display {
+        keyword,
+        file: Some(file.unwrap_or("".to_string())),
+        directory: Some(directory.unwrap_or("".to_string())),
     };
-
-    if !output_name_value.is_some() {
-        return Err("Please specify output name.".to_string());
-    } else {
-        display.keyword = output_name_value.unwrap().to_string();
-    }
-
-    if file_value.is_some() {
-        display.file = Some(file_value.unwrap().to_string());
-    }
-
-    if directoy_value.is_some() {
-        display.directoy = Some(directoy_value.unwrap().to_string());
-    }
-
-    if !display.directoy.is_some() && !display.file.is_some() {
-        return Err("Please specify the folder or image to use.".to_string());
-    }
 
     Ok(display)
 }

@@ -9,5 +9,5 @@ pub struct Config {
 pub struct Display {
     pub keyword: String,
     pub file: Option<String>,
-    pub directoy: Option<String>,
+    pub directory: Option<String>,
 }
