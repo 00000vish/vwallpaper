@@ -75,7 +75,12 @@ fn get_app_config(data: Value) -> Result<String, String> {
 }
 
 fn check_value_valid(key: String, value: &Value) -> Result<String, String> {
-    match value.to_string().trim() {
+    let value_str = match value {
+        Value::String(string_val) => string_val.to_string(),
+        _ => value.to_string(),
+    };
+
+    match value_str.trim() {
         "" => Err(format!("Invalid input for key {}", key)),
         string_val => Ok(string_val.to_string()),
     }
