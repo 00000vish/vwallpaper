@@ -1,6 +1,6 @@
 use crate::{helpers, models::Config};
 use std::{
-    process::{Child, Command},
+    process::{Child, Command, Stdio},
     rc::Rc,
 };
 
@@ -27,12 +27,17 @@ impl App {
             app_config = app_config.replace(&display.keyword, &wallpaper);
         }
         helpers::update_file(&self.config.config_file, &app_config);
+        println!("[LOG] Changing wallpapers");
         self.close();
         self.open();
     }
 
     fn open(&mut self) {
-        let instance = Command::new(&self.config.app).spawn();
+        let instance = Command::new(&self.config.app)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
         self.app_instance = instance.ok();
     }
 
