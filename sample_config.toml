@@ -16,7 +16,7 @@ preload = $DP-1
 preload = $DP-2
  
 wallpaper = DP-1, $DP-1
-wallpaper = DP-1, $DP-2
+wallpaper = DP-2, $DP-2
 
 splash = false
 '''
