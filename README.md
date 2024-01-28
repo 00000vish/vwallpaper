@@ -6,6 +6,8 @@ But mostly trying to learn rust.
 
 
 # HOW TO USE
-o - Copy the sample_config.toml into ~/.config/vwallpaper/config.toml
-o - Update config.toml as needed
-o - Run the vwallpaper.
+Copy the sample_config.toml into ~/.config/vwallpaper/config.toml
+
+Update config.toml as needed
+
+Run the vwallpaper
