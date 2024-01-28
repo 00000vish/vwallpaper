@@ -1,0 +1,22 @@
+app="hyprpaper"
+config_file="~/.config/hypr/hyprpaper.conf"
+seconds=10
+
+[DP-1]
+keyword="$DP-1"
+directory="~/.config/wallpapers/"
+
+[DP-2]
+keyword="$DP-2"
+directory="~/.config/wallpapers/"
+
+[Config]
+template = '''
+preload = $DP-1 
+preload = $DP-2
+ 
+wallpaper = DP-1, $DP-1
+wallpaper = DP-1, $DP-2
+
+splash = false
+'''
