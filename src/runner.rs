@@ -28,9 +28,9 @@ impl Runner {
         return true;
     }
 
-    async fn run_loop(&self) {
+    async fn run_loop(&mut self) {
         loop {
-            if let Some(app) = &self.app {
+            if let Some(app) = &mut self.app {
                 app.start();
             }
             sleep(Duration::from_secs(self.config.seconds)).await;

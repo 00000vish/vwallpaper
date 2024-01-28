@@ -5,12 +5,12 @@ use std::{
     io::Write,
 };
 
-pub fn get_wallpaper(display: Display) -> Result<String, String> {
-    match display.file {
-        Some(value) => return Ok(value),
+pub fn get_wallpaper(display: &Display) -> Result<String, String> {
+    match &display.file {
+        Some(value) => return Ok(value.to_string()),
         None => (),
     }
-    let directory = match display.directory {
+    let directory = match &display.directory {
         None => return Err("Please specify a wallpaper for directory.".to_string()),
         Some(value) => value,
     };
@@ -44,7 +44,7 @@ pub fn get_wallpaper(display: Display) -> Result<String, String> {
     Ok(wallpaper_file.to_string())
 }
 
-pub fn update_file(path: String, content: String) -> bool {
+pub fn update_file(path: &String, content: &String) -> bool {
     let mut file = match File::create(path) {
         Err(_) => return false,
         Ok(value) => value,

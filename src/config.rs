@@ -39,7 +39,7 @@ pub fn read_config() -> Result<Rc<Config>, String> {
         if key == "app" {
             config.app = check_value_valid(key, &value)?;
         } else if key == "config_file" {
-            config.config_file = check_value_valid(key, &value)?;
+            config.config_file = parse_path(check_value_valid(key, &value)?);
         } else if key == "seconds" {
             config.seconds = check_value_valid(key, &value)?.parse().unwrap_or(1800);
         } else if key == "Config" {
@@ -65,7 +65,7 @@ fn get_app_config(data: Value) -> Result<String, String> {
     }
 
     if file.is_ok() {
-        match helpers::read_file(file.unwrap()) {
+        match helpers::read_file(parse_path(file.unwrap().to_string())) {
             None => return Err("Could not read config file".to_string()),
             Some(value) => return Ok(value),
         }
@@ -104,11 +104,28 @@ fn parse_display_struct(data: Value) -> Result<Display, String> {
 
     let display = Display {
         keyword,
-        file: Some(file.unwrap_or("".to_string())),
-        directory: Some(directory.unwrap_or("".to_string())),
+        file: match file {
+            Ok(value) => Some(parse_path(value)),
+            Err(_) => None,
+        },
+        directory: match directory {
+            Ok(value) => Some(parse_path(value)),
+            Err(_) => None,
+        },
     };
 
     Ok(display)
+}
+
+fn parse_path(data: String) -> String {
+    let home_dir = dirs::home_dir();
+    if !home_dir.is_some() {
+        return data;
+    }
+    if data.starts_with("~") {
+        return data.replace("~", home_dir.unwrap().to_str().unwrap());
+    }
+    data
 }
 
 fn get_config_file_path() -> String {
